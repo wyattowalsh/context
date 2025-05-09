@@ -1,0 +1,64 @@
+# Gitingest Knowledge File
+
+## Overview
+Gitingest converts Git repositories or local directories into an LLM-friendly digest:
+- **Summary**: repository name, size, token count  
+- **Tree**: directory structure  
+- **Content**: concatenated file contents
+
+## Installation
+```bash
+pip install gitingest
+# or, isolated:
+pipx install gitingest
+```
+
+## CLI Usage
+
+```text
+Usage: gitingest [OPTIONS] [SOURCE]
+
+  Main entry point for the CLI. Analyzes SOURCE (local path or GitHub URL)
+  and writes a prompt-ready digest.
+
+Arguments:
+  SOURCE                 Path or repository URL to ingest
+
+Options:
+  -o, --output TEXT      Output file path (default: <repo_name>.txt)
+  -s, --max-size INTEGER Maximum file size to process in bytes
+  -e, --exclude-pattern TEXT
+                         Pattern to exclude (can be repeated)
+  -i, --include-pattern TEXT
+                         Pattern to include (can be repeated)
+  -b, --branch TEXT      Git branch to clone and ingest
+  --help                 Show this message and exit
+```
+
+## Python API
+```python
+from gitingest import ingest, ingest_async
+
+# synchronous
+summary, tree, content = ingest("<source>")
+
+# asynchronous (e.g., in Jupyter)
+summary, tree, content = await ingest_async("<source>")
+```
+- **Returns**: `(summary, tree, content)`
+
+## Configuration
+Create a `.gitingest` in the repo root to set defaults:
+```yaml
+include:
+  - "src/**/*.py"
+exclude:
+  - "tests/*"
+max_tokens: 1500
+```
+
+## Self-Hosting (Optional)
+```bash
+docker build -t gitingest .
+docker run -p 8000:8000 gitingest
+```

@@ -1,0 +1,240 @@
+---
+title: context
+description: context is a system for efficiently generating LLM-ready knowledge files from web, file, and github data sources
+githubRepo: https://github.com/wyattowalsh/context
+homepage: https://promptcontext.xyz
+---
+
+`context` helps prepare optimized-for-LLM knowledge / prompt context using web, file, or GitHub repo resources. 
+
+The tools are exposed via an MCP Server (see @modelcontextprotocol-modelcontextprotocol.txt) via FastMCP v2 (see @jlowin-fastmcp.txt), a CLI via Typer (see @fastapi-typer.txt), and a REST API via FastAPI (see @fastapi-fastapi.txt). 
+
+Crawl4AI (see @unclecode-crawl4ai.txt) is used for processing of web content.
+Docling (see @docling-project-docling.txt) is used for file processing.
+Gitingest (see @gitingest.txt) for ingesting GitHub repo data. '
+
+`context` processes an input collection of web URLs or local file paths into a single optimized-for-LLM context knowledge file (or possibly multiple file if the resulting single-file output size is more than a configurable level (e.g. 10mb)) in either `.md`, `.html`, `.json`, `.xml`, or `.txt` output format.
+
+---
+
+## Specifics
+
+- uses a combination of Crawl4AI web scraping/crawling + Docling document conversion + Gitingest GitHub repo processing to create unified, aggegrated, optimized-as-LLM-context output LLM knowledge files
+- intelligently (semantically by route depth in a depth prioritized manner) splits output context files that are too large into multiple files (w/ configurable max file size w/ default 10mb)
+- efficient, robust, flexible, extendible, performant, elegant
+- everything can be async
+- careful aggregation/compilation of results into minimal optimized-for-LLM knowledge file outputs (`.md`, `.html`, `.json`, `.xml`, or `.txt`)
+- intelligently applies the correct tool depending on the URL variety (i.e. file `Path` to file processor, github URL to github processor, and other urls to the web processor)
+- for markdown outputs:
+    - well-structured, well-formed containing separators and demaracators for maximal resulting output clarity and informativeness
+- intelligent output naming (if a single URL scrape, then the a cleaned, sanitized, formatted input domain + general time (down to the hour) + unique ID)
+- multifile outputs
+- configurable output directory path
+- option for single file per source (URL) or single (or minimal count where each file is below the max file size), unified file for all sources
+- option to download crawl-discovered files
+- option to process crawl-discovered files for output inclusion
+
+---
+
+### Tech Stack
+
+- [FastMCP v2](https://gofastmcp.com/): MCP Serer development framework (see @jlowin-fastmcp.txt)
+- [Crawl4AI](http://crawl4ai.com/): Web data collection + ingestion (see @unclecode-crawl4ai.txt)
+- [Docling](https://docling-project.github.io/docling/): File conversion + preparation (see @docling-project-docling.txt)
+- [Gitingest](https://gitingest.com/): GitHub repo ingestion + preparation (see @gitingest.txt)
+- [Typer](http://typer.tiangolo.com): CLI framework (see @fastapi-typer.txt)
+- [FastAPI](http://fastapi.tiangolo.com/): REST API framework (see @fastapi-fastapi.txt)
+- [Loguru](https://github.com/Delgan/loguru): Advanced logging (see @delgan-loguru.txt)
+- [Rich](https://github.com/Textualize/rich): Pretty logging (see @textualize-rich.txt)
+- [tqdm](https://github.com/tqdm/tqdm): Progress bars (see @tqdm-tqdm.txt)
+- [Pydantic v2](https://github.com/pydantic/pydantic): Data validation (see @pydantic-pydantic.txt)
+- [ruff](https://github.com/astral-sh/ruff): Formatting + Linting (see @astral-sh-ruff.txt)
+- [uv](https://github.com/astral-sh/uv): Python project management (see @astral-sh-uv.txt)
+
+- [FumaDocs](https://github.com/fuma-nama/fumadocs): Project docs site (see @fuma-nama-fumadocs.txt)
+- [shadcn-ui](https://github.com/shadcn-ui/ui): Component lib (see @shadcn-ui_website-content-crawler_2025-05-08.json )
+
+- [Makefile](https://www.gnu.org/software/make/): Build system (see @make.txt)
+- [GitHub Actions](https://docs.github.com/en/actions): CI/CD workflows (see @github-actions.txt)
+- [Zsh](https://zsh.sourceforge.io/): Shell (see @zsh.txt)
+
+---
+
+### Project Structure & File Tree
+
+```
+context
+├── context/                   # Project package
+│   ├── cli.py                 # Typer CLI
+│   ├── api.py                 # FastAPI REST API
+│   ├── server.py              # MCP Server
+│   ├── models.py              # Data models and schemas
+│   └── utils.py               # Utility functions and helpers
+├── docs/                      # Documentation directory
+├── README.md                  # Project overview and getting started guide
+├── pyproject.toml             # Python project configuration and dependencies
+└── Makefile                   # Build automation and task definitions
+```
+
+---
+
+### Usage Examples
+
+- convert a local file to LLM-ready markdown
+- scrape a website to LLM-ready markdown
+- crawl a website's pages to LLM-ready markdown
+- process a GitHub repo to LLM-ready markdown
+- process an arbitrarily large collection of URLs + file paths to LLM-ready markdown
+- process an arbitrarily large collection of URLs + file paths to LLM-ready markdown with custom configuration
+
+---
+
+### Architecture
+
+```mermaid
+flowchart LR;
+
+    subgraph "Input URLs/Paths"
+        a1[Web URLs]
+        a2[Local File Paths]
+    end
+
+    subgraph "`context`"
+        b1[web data processor]
+        b2[file data processor]
+        b3[github data processor]
+        c[output compiler]
+        subgraph "Output Formats"
+            e1[.md]
+            e2[.html]
+            e3[.xml]
+            e4[.json]
+        end
+    end
+
+    f[Output Directory]
+
+    a1 -->|"if github in domain"| b3 --> c
+    a1 -->|"if github not in domain, but web URL"| b1 -->|if downloaded file| b2
+    b1 --> c
+    
+    a2 --> b2 --> c
+    c --> e1 & e2 & e3 & e4
+    e1 & e2 & e3 & e4 --> f
+```
+
+- Web URLs are processed by the github data processor if the domain is github.com else the web data processor. If the web data processor encouters and downloads any files, these files are then processed by the file data processor.
+- Local File Paths are processed by the file data processor.
+- All outputs of the data processors are compiled into the output directory using the output compiler.
+- The output compiler can output the data in a variety of formats to the output directory.
+
+---
+
+### Content Ingestion
+
+#### Web Content
+
+- generate route tree of the visited pages
+- generate session summary header
+  - sitemap parsing
+  - supports automatic discovery (by checking common locations on the target domain)
+  - supports nested sitemap discovery
+  - respects inclusion/exclusion + file type inclusion/exclusion patterns
+- assures no link is processed more than once (even if rediscovered during the crawl or sitemap ingestion)
+- configurables for
+    - include screenshots
+    - BFS vs DFS across discovered routes
+    - allow subdomains
+    - no reverse crawling
+    - no off-domain crawling
+    - page limit
+    - max depth
+    - globs for route inclusion and router exclusion
+    - which file types to include and which file types to exclude
+        -  pdf
+        -  ppt
+        -  docx
+        -  with some variable groups:
+            -  img: jpeg, jpg, png, webp, tiff, etc
+            -  video: gif, mp4, mov, etc
+            -  audio: mp3, flac, wav, etc
+            -  data: csv, json, feather, parquet, etc
+    - proxy_config
+    - include session summary header
+    - include visited route tree
+
+
+#### File Content
+
+- no chunking unless converted content output file is greater than max output file size (in which case it is intelligently split as needed)
+- formula understanding (i.e. `--enrich-formula`)
+- picture classification (i.e `enrich-picture-classes`)
+- picture description
+- dynamic downloads for missing OCR or vision model models
+- configurables for:
+    - OCR engine
+    - vision model
+    - which file types to include and which file types to exclude
+        -  pdf
+        -  ppt
+        -  docx
+        -  with some variable groups:
+            -  img: jpeg, jpg, png, webp, tiff, etc
+            -  video: gif, mp4, mov, etc
+            -  audio: mp3, flac, wav, etc
+            -  data: csv, json, feather, parquet, etc
+
+
+#### GitHub Content
+
+- By default, collects all `.md`, `.mdx`, `.rst`, `.txt`, and `.ipynb` files from the `./docs/` directory (if it exists, otherwise repo root)
+- configurables for:
+    - include & exclude path globs
+    - include summary
+    - include file tree
+
+---
+
+### CLI
+
+#### Commands
+
+- `context` -> configurable context fetching/preparation for an input list of URLs or file paths
+- `context --help` -> show help
+- `context --version` -> show version
+- `context --config` -> show config
+- `context --debug` -> show debug
+- `context --log-level` -> set log level
+
+---
+
+### REST API
+
+#### Endpoints
+
+- `GET /context` -> get context for an input list of URLs or file paths
+- `POST /context` -> post context for an input list of URLs or file paths
+- `GET /context/config` -> get config
+- `GET /context/debug` -> get debug
+- `GET /context/log-level` -> get log level
+
+---
+
+### MCP Server
+
+- 
+
+#### Tools Exposed
+
+- `get_context` -> configurable context fetching/preparation for an input list of URLs or file paths
+
+#### Prompts Exposed
+
+- `get_context_default` -> example prompt to use the `get_context` tool with default configuration
+- `get_context_with_configuration` -> example prompt to use the `get_context` tool with custom configuration
+
+#### Resources Exposed
+
+- `default_config` -> full default configuration example for the `get_context` tool
+- `context_mcp_docs` -> full documentation for the `get_context` MCP server
+

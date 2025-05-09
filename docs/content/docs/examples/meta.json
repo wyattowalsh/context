@@ -1,0 +1,12 @@
+{
+    "title": "Usage Examples",
+    "icon": "AiOutlineExperiment",
+    "description": "Examples of how to use the context python library, cli, api, and mcp server",
+    "pages": [
+        "python",
+        "cli",
+        "api",
+        "mcp"
+    ],
+    "defaultOpen": false
+}

@@ -1,0 +1,15 @@
+{
+    "title": "Context Docs root folder",
+    "description": "Context Docs root folder",
+    "root": true,
+    "tabs": false,
+    "pages": [
+        "index",
+        "installation",
+        "stack",
+        "details",
+        "examples",
+        "contributing",
+        "resources"
+    ]
+}

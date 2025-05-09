@@ -1,0 +1,15 @@
+[project]
+name = "context-mcp"
+version = "0.1.0"
+description = "an MCP server to gather AI/LLM context from web sources and/or files"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "crawl4ai>=0.6.2",
+    "fastapi>=0.115.12",
+    "fastmcp>=2.2.10",
+    "gitingest>=0.1.4",
+    "loguru>=0.7.3",
+    "rich>=14.0.0",
+    "typer>=0.15.2",
+]

@@ -1,0 +1,62 @@
+---
+title: Installation
+description: Installation instructions for the context library
+icon: PackagePlus
+full: false
+---
+
+---
+
+## Prerequisites
+
+- `Python 3.10+`
+- `uv` [[here](https://docs.astral.sh/uv/getting-started/installation/)]
+
+---
+
+## Installation
+
+### Clone the repository
+
+```zsh
+git clone https://github.com/wyattowalsh/context.git && cd context
+```
+
+### Install <span className="context-text">context</span>
+
+```zsh
+uv venv && source .venv/bin/activate && uv sync --all-groups
+```
+
+### Install dependencies
+
+```zsh
+uv sync --all-groups
+```
+
+### Launch the Docs Server
+
+```
+cd docs && npm run dev
+```
+
+### Run the MCP Server
+
+```zsh
+uv run python context/server.py
+```
+
+### Run the CLI
+
+```zsh
+uv run context
+```
+
+### Run the REST API
+
+```zsh
+uv run context/api.py
+```
+
+
+
